@@ -5,8 +5,23 @@ import Pagination from '@material-ui/lab/Pagination'
 
 function ListCard() {
     const [data, setData] = React.useState([]);
-    const [page, setPage] = React.useState('');
-    console.log(page);
+    const [page, setPage] = React.useState(1);
+   
+    function handlePage(e) {
+        setPage(e.target.textContent)
+       
+        
+    }
+  
+    function getPaginationApiData(page) {
+      
+       axios
+         .get(`https://rickandmortyapi.com/api/character/?page=${page}`)
+         .then((response) => {
+           console.log(response);
+           setData(response.data.results);
+         });
+    }
     function getApiData() {
         fetch("https://rickandmortyapi.com/api/character")
             .then(res => res.json())
@@ -14,26 +29,45 @@ function ListCard() {
                 console.log(data.results)
                 setData(data.results)
         })
-        //  axios.get('https://rickandmortyapi.com/api/character')
-        //      .then((response) => {
-        //          console.log(response)
-        //          setData(response.data);
-        //  })
-     }
+    }
+        React.useEffect(() => {
+          getPaginationApiData(page);
+        }, [page]);
+    
     React.useEffect(() => {
-        getApiData();
-  },[])
+       getApiData();
+    }, [])
+    
+
     return (
-        <div>   
-       
-            {data.map((val) => {
-                return <div key={ val.id} style = {{margin:"10px"}}>
-                    <Card {...val}/>
-                    </div>
-            })}
-            <Pagination count={20} page={ page} />
-        </div>
-    )
+      <div>
+        <Pagination
+          count={30}
+          defaultPage={1}
+          onChange={handlePage}
+          size="large"
+        />
+        <button>alive</button>
+        <button>dead</button>
+        <button>unKnown</button>
+        {data.map((val) => {
+          return (
+            <div
+              key={val.id}
+              style={{
+                margin: "5px",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Card {...val} />
+            </div>
+          );
+        })}
+      </div>
+    );
 }
 
 export default ListCard
